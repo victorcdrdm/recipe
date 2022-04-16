@@ -5,9 +5,21 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\RecipeIngredientRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
- * @ApiResource()
+ * @ApiResource(
+ *      normalizationContext={"groups"={"recipies:read"}, "enable_max_depth"=true},
+ *      itemOperations={
+ *          "put",
+ *          "delete",
+ *          "get"={"normalizationContext"={"groups"={"recipies:read"}, "enable_max_depth"=true}}
+ *      },
+ *      collectionOperations={
+ *          "post",
+ *          "get"={"normalizationContext"={"groups"={"recipies:read"}, "enable_max_depth"=true}}
+ *      }
+ * )
  * @ORM\Entity(repositoryClass=RecipeIngredientRepository::class)
  */
 class RecipeIngredient
@@ -16,26 +28,31 @@ class RecipeIngredient
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"recipies:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="integer")
+     * @Groups({"recipies:read"})
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"recipies:read"})
      */
     private $unity;
 
     /**
      * @ORM\ManyToOne(targetEntity=Recipe::class, inversedBy="recipeIngredients")
+     * @Groups({"recipies:read"})
      */
     private $recipe;
 
     /**
      * @ORM\ManyToOne(targetEntity=Ingredient::class, inversedBy="recipeIngredients")
+     * @Groups({"recipies:read"})
      */
     private $ingredient;
 

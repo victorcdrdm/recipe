@@ -3,8 +3,8 @@
     <h1>Carnet de recette</h1>
     <div class="newRecipes" @click="showForm = !showForm">+</div>
     <form v-show="showForm">
-      <input type="text" placeholder="Nom de la recette">
-      <div class="ingredientsFields" v-for="ingredient, index in ingredients" :key="index">
+      <input type="text" placeholder="Nom de la recette" v-model="name">
+      <div class="ingredientsFields" v-for="ingredient, index in newIngredients" :key="index">
         <input type="text" placeholder="Ingredient" v-model="ingredient.name">
         <input type="number" placeholder="Quantiter" v-model="ingredient.quantity">
         <select v-model="ingredient.unity">
@@ -15,11 +15,27 @@
       <div class="newRecipes" @click="addFields">+</div>
       <textarea name="method" v-model="method"/>
     </form>
-     <button class="newRecipes" @click="newRecipe">Soumettre le formulaire</button>
+
+     <button @click="newRecipe">Soumettre le formulaire</button>
+    <div class="ingredients" v-for="ingredient, index in ingredients" :key="index">
+      <p> {{ingredient.id}}  {{ingredient.name}} </p>
+    </div>
+    <hr>
+    <div class="recipies" v-for="recipe, i in recipies" :key="i">
+      <p> {{recipe.name}} </p>
+      <div class="ingredients" v-for="ingredient, j in recipe.recipeIngredients" :key="j">
+       <p> {{ingredient.ingredient.name}} {{ingredient.quantity}} {{ingredient.unity}} </p> 
+      </div>
+      <hr>
+    </div>
+     
   </div>
 </template>
 
 <script>
+
+import serverFile from '../api/ServerFile'
+
 export default {
   name: 'HomeView',
   components: {
@@ -29,7 +45,9 @@ export default {
       showForm: false,
       name: '',
       method: '',
-      ingredients: [{
+      ingredients: [],
+      recipies: [],
+      newIngredients: [{
         name: '',
         quantity: Number,
         unity: '',
@@ -38,15 +56,36 @@ export default {
   },
   methods: {
     addFields() {
-      this.ingredients.push({
+      this.newIngredients.push({
         name: '',
         quantity: Number,
         unity: ''
       })
     },
     newRecipe() {
-      console.log(this.ingredients)
+      let recipes = {1: 'crumble', 2:"test2", 3:'Super'}
+      console.log()
+      let params = { name: this.name,
+                     method: this.method }
+       console.log(this.name in recipes)              
+      serverFile.newRecipe(params).then((response) => {
+       console.log(response)
+      })
+    },
+    getAllRecipies() {
+      serverFile.getAllRecipes().then((response)=>{
+        this.recipies = response['hydra:member']
+      })
+    },
+    getAllIngredients() {
+      serverFile.getAllIngredients().then((response) => {
+        this.ingredients = response['hydra:member']
+      })
     }
+  },
+  mounted: function() {
+    this.getAllRecipies()
+    this.getAllIngredients()
   }
 }
 </script>
