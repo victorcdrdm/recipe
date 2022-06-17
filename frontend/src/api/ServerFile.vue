@@ -7,10 +7,15 @@ function getAllRecipes() {
 function newRecipe(params) {
   return http.post('/api/recipes', params)
 }
+
 function getAllIngredients() {
   return http.get('api/ingredients')
 }
 
+function findIngredientByName(search) {
+  console.log(search)
+  return http.get('api/ingredients?name=' + search)
+}
 import http from '../utils/http'
 
 export default {
@@ -18,5 +23,6 @@ export default {
   getAllRecipes,
   getAllIngredients,
   newRecipe,
+  findIngredientByName,
 }
 </script>
