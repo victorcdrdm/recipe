@@ -45,6 +45,12 @@ class Ingredient
     private $name;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"recipies:read"})
+     */
+    private $label;
+
+    /**
      * @ORM\OneToMany(targetEntity=RecipeIngredient::class, mappedBy="ingredient")
      */
     private $recipeIngredients;
@@ -72,6 +78,22 @@ class Ingredient
     }
 
     /**
+     * @return mixed
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
+     * @param mixed $label
+     */
+    public function setLabel($label): void
+    {
+        $this->label = $label;
+    }
+
+    /**
      * @return Collection<int, RecipeIngredient>
      */
     public function getRecipeIngredients(): Collection
@@ -85,7 +107,6 @@ class Ingredient
             $this->recipeIngredients[] = $recipeIngredient;
             $recipeIngredient->setIngredient($this);
         }
-
         return $this;
     }
 
@@ -97,7 +118,6 @@ class Ingredient
                 $recipeIngredient->setIngredient(null);
             }
         }
-
         return $this;
     }
 }

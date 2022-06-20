@@ -1,33 +1,40 @@
 <template>
   <div class="home">
     <h1>Carnet de recette</h1>
-    <div class="newRecipes" @click="showForm = !showForm">+</div>
-    <form v-show="showForm">
-      <input type="text" placeholder="Nom de la recette" v-model="name">
-      <div class="ingredientsFields" v-for="(ingredient, index) in newIngredientsRecipe" :key="index">
-        <v-select @search="onSearchIngredient" :options="options">
-          <template slot="no-options">
-            pas d'ingredient
-          </template>
-          <template slot="option" slot-scope="option">
-            <div class="d-center">
-              {{ option.name }}
-            </div>
-          </template>
-          <template slot="selected-option" slot-scope="option">
-            <div class="selected d-center">
-              {{ option.name }}
-            </div>
-          </template>
-          <div class="spinner" v-show="spinner">Loading...</div>
-        </v-select>
-        <input type="number" placeholder="Quantiter" v-model="ingredient.quantity">
-        <select v-model="ingredient.unity">
-          <option value="gr">gr</option>
-          <option value="pce">pce</option>
-        </select> 
-      </div>
+    <div class="newRecipes" @click="form = !form">+</div>
+
+    <form v-show="form">
+      <input type="text" placeholder="Nom de la recette" v-model="recipeName">
+      <v-select @search="onSearchIngredient" :options="options" v-model="ingredients">
+        <template slot="no-options" v-if="options">
+          Cette ingredient n'existe pas encore.
+          <br>
+          <button @click="addNewIngredient()">
+            Ajouter cette ingredient ?
+          </button>
+        </template>
+        <template slot="option" slot-scope="option" >
+          <div class="d-center">
+            {{ option.name }}
+          </div>
+        </template>
+        <template slot="selected-option" slot-scope="option">
+          <div class="selected d-center" >
+            {{ option.name }}
+          </div>
+        </template>
+        <div class="spinner" v-show="loader">Loading...</div>
+      </v-select>
+      <input type="number" placeholder="Quantiter" v-model="quantity">
+      <select v-model="unity">
+        <option value="gr">gr</option>
+        <option value="pce">pce</option>
+      </select>
+
       <button class="btn btn-classic" @click="addRecipeIngredient">ajouter un autre ingredient</button>
+
+      <div class="ingredientsFields" v-for="(ingredient, index) in newIngredientsRecipe" :key="index">
+      </div>
       <textarea name="method" v-model="method"/>
       <button @click="newRecipe">Soumettre le formulaire</button>
     </form>
@@ -57,12 +64,16 @@ export default {
   },
   data() {
     return {
-      showForm: false,
-      name: '',
+      form: false,
+      recipeName: '',
       method: '',
       ingredients: [],
       recipes: [],
       options: [],
+      loader: false,
+      ingredientName: '',
+      quantity: Number,
+      unity: '',
       newIngredientsRecipe: [{
         name: '',
         quantity: Number,
@@ -72,6 +83,7 @@ export default {
   },
   methods: {
     addRecipeIngredient() {
+      console.log(this.unity, this.quantity, this.ingredients)
       this.newIngredientsRecipe.push({
         name: '',
         quantity: Number,
@@ -89,14 +101,10 @@ export default {
         this.recipes = response['hydra:member']
       })
     },
-    getAllIngredients() {
-      serverFile.getAllIngredients().then((response) => {
-        this.ingredients = response['hydra:member']
-      })
-    },
     onSearchIngredient(search, loading) {
       if(search.length) {
         loading(true);
+        this.newIngredient = { name: search, label: search }
         this.searchIngredient(loading, search, this);
       }
     },
@@ -104,15 +112,21 @@ export default {
       serverFile.findIngredientByName(search).then((response) => {
         if (response) {
           vm.options = response['hydra:member']
-          console.log(vm.options)
           loading(false);
         }
       })
-    }, 350)
+    }, 350),
+    addNewIngredient() {
+      serverFile.newIngredient(this.newIngredient).then((response) => {
+        if (response) {
+          this.options.push(response)
+          this.newIngredient = { name: '', label: '' }
+        }
+      })
+    },
   },
   mounted: function() {
     this.getAllRecipes()
-    this.getAllIngredients()
   }
 }
 </script>

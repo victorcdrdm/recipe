@@ -13,9 +13,13 @@ function getAllIngredients() {
 }
 
 function findIngredientByName(search) {
-  console.log(search)
   return http.get('api/ingredients?name=' + search)
 }
+
+function newIngredient(newIngredient) {
+  return http.post('api/ingredients', newIngredient )
+}
+
 import http from '../utils/http'
 
 export default {
@@ -24,5 +28,7 @@ export default {
   getAllIngredients,
   newRecipe,
   findIngredientByName,
+  newIngredient,
+
 }
 </script>
