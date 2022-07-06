@@ -5,7 +5,7 @@
 
     <form v-show="form">
       <input type="text" placeholder="Nom de la recette" v-model="recipeName">
-      <v-select @search="onSearchIngredient" :options="options" v-model="ingredients">
+      <v-select @search="onSearchIngredient" :options="options" v-model="ingredientSelected">
         <template slot="no-options" v-if="options">
           Cette ingredient n'existe pas encore.
           <br>
@@ -31,9 +31,11 @@
         <option value="pce">pce</option>
       </select>
 
-      <button class="btn btn-classic" @click="addRecipeIngredient">ajouter un autre ingredient</button>
-
-      <div class="ingredientsFields" v-for="(ingredient, index) in newIngredientsRecipe" :key="index">
+      <button class="btn btn-classic" @click="addIngredientToNewRecipes">ajouter un autre ingredient</button>
+      <div v-if="newIngredientsRecipe">
+        <div class="ingredientsFields" v-for="(ingredient, index) in newIngredientsRecipe" :key="index">
+          <p> {{ ingredient.name }} {{ingredient.quantity}} {{ingredient.unity}}</p>
+        </div>
       </div>
       <textarea name="method" v-model="method"/>
       <button @click="newRecipe">Soumettre le formulaire</button>
@@ -67,33 +69,40 @@ export default {
       form: false,
       recipeName: '',
       method: '',
+      ingredientSelected: [],
       ingredients: [],
       recipes: [],
       options: [],
       loader: false,
-      ingredientName: '',
-      quantity: Number,
+      quantity: '',
       unity: '',
-      newIngredientsRecipe: [{
-        name: '',
-        quantity: Number,
-        unity: '',
-      }],
+      newIngredientsRecipe: [],
     }
   },
   methods: {
-    addRecipeIngredient() {
-      console.log(this.unity, this.quantity, this.ingredients)
-      this.newIngredientsRecipe.push({
-        name: '',
-        quantity: Number,
-        unity: ''
+    addIngredientToNewRecipes() {
+      this.ingredients.push({
+        ingredient : 'api/ingredients/' + this.ingredientSelected.id,
+        unity : this.unity,
+        quantity: parseInt(this.quantity),
       })
+      this.newIngredientsRecipe.push({
+        name : this.ingredientSelected.name,
+        unity : this.unity,
+        quantity: parseInt(this.quantity),
+      })
+      this.unity = ''
+      this.quantity = null
+      this.ingredientSelected = []
     },
     newRecipe() {
-      let params = { name: this.name,
-                     method: this.method }
-      serverFile.newRecipe(params).then(() => {
+      this.addIngredientToNewRecipes()
+      let params = { name: this.recipeName,
+                     method: this.method,
+                     recipeIngredients : this.ingredients,
+      }
+      serverFile.newRecipe(params).then((response) => {
+        console.log(response)
       })
     },
     getAllRecipes() {
@@ -120,7 +129,6 @@ export default {
       serverFile.newIngredient(this.newIngredient).then((response) => {
         if (response) {
           this.options.push(response)
-          this.newIngredient = { name: '', label: '' }
         }
       })
     },

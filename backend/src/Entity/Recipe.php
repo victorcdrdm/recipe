@@ -16,10 +16,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ApiResource(
  *      normalizationContext={"groups"={"recipies:read"}, "enable_max_depth"=true},
+ *      denormalizationContext={"groups"={"recipies:whrite"}, "enable_max_depth"=true},
  *      itemOperations={
  *          "put",
  *          "delete",
- *          "get"={"normalizationContext"={"groups"={"recipies:read"}, "enable_max_depth"=true}}
+ *          "get"
  *      },
  *      collectionOperations={
  *          "post",
@@ -41,18 +42,19 @@ class Recipe
 
     /**
      * @ORM\Column(type="text", unique=true)
-     * @Groups({"recipies:read"})
+     * @Groups({"recipies:read", "recipies:whrite"})
      */
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity=RecipeIngredient::class, mappedBy="recipe")
-     * @Groups({"recipies:read"})
+     * @ORM\OneToMany(targetEntity=RecipeIngredient::class, mappedBy="recipe", cascade={"persist"})
+     * @Groups({"recipies:read", "recipies:whrite"})
      */
     private $recipeIngredients;
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     * @Groups({"recipies:read", "recipies:whrite"})
      */
     private $method;
 

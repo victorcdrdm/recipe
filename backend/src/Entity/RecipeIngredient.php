@@ -6,20 +6,10 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\RecipeIngredientRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource(
- *      normalizationContext={"groups"={"recipies:read"}, "enable_max_depth"=true},
- *      itemOperations={
- *          "put",
- *          "delete",
- *          "get"={"normalizationContext"={"groups"={"recipies:read"}, "enable_max_depth"=true}}
- *      },
- *      collectionOperations={
- *          "post",
- *          "get"={"normalizationContext"={"groups"={"recipies:read"}, "enable_max_depth"=true}}
- *      }
- * )
+ * @ApiResource()
  * @ORM\Entity(repositoryClass=RecipeIngredientRepository::class)
  */
 class RecipeIngredient
@@ -33,26 +23,28 @@ class RecipeIngredient
     private $id;
 
     /**
+     * @Assert\Type("numeric")
      * @ORM\Column(type="integer")
-     * @Groups({"recipies:read"})
+     * @Groups({"recipies:read", "recipies:whrite"})
      */
     private $quantity;
 
     /**
+     * @Assert\Type("string")
      * @ORM\Column(type="string", length=255)
-     * @Groups({"recipies:read"})
+     * @Groups({"recipies:read", "recipies:whrite"})
      */
     private $unity;
 
     /**
      * @ORM\ManyToOne(targetEntity=Recipe::class, inversedBy="recipeIngredients")
-     * @Groups({"recipies:read"})
+     * @Groups ({"recipies:whrite"})
      */
     private $recipe;
 
     /**
      * @ORM\ManyToOne(targetEntity=Ingredient::class, inversedBy="recipeIngredients")
-     * @Groups({"recipies:read"})
+     * @Groups({"recipies:read", "recipies:whrite"})
      */
     private $ingredient;
 

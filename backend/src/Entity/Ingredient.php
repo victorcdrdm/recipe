@@ -40,13 +40,13 @@ class Ingredient
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"recipies:read"})
+     * @Groups({"recipies:read"}, {"recipies:wrhite"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"recipies:read"})
+     * @Groups({"recipies:read"}, {"recipies:wrhite"})
      */
     private $label;
 
