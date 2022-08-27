@@ -1,43 +1,48 @@
 <template>
   <div class="home">
-    <h1>Carnet de recette</h1>
+    <h1 class="text-3xl underline">Carnet de recettes</h1>
     <div class="newRecipes" @click="form = !form">+</div>
-
-    <form v-show="form">
-      <input type="text" placeholder="Nom de la recette" v-model="recipeName">
-      <v-select @search="onSearchIngredient" :options="options" v-model="ingredientSelected">
+    <form class="flex flex-col align-center m-auto w-3/6 " v-show="form">
+      <label for="name" class="text-left mb-1">Nouvelle recette:</label>
+      <input type="text" class="mb-3" name="name" placeholder="Ajouter le nom de votre recette" v-model="recipeName">
+      <label for="" class="text-left mb-1">Rechere ou Ajouter un ingredient</label>
+      <v-select class="mb-3" @search="onSearchIngredient" :options="options" v-model="ingredientSelected">
         <template slot="no-options" v-if="options">
-          Cette ingredient n'existe pas encore.
-          <br>
-          <button @click="addNewIngredient()">
-            Ajouter cette ingredient ?
-          </button>
+          <hr>
+          <div @click="addNewIngredient()">
+            Cette ingredient n'existe pas encore, l'ajouter?
+          </div>
         </template>
-        <template slot="option" slot-scope="option" >
+        <template slot="option" slot-scope="option">
           <div class="d-center">
             {{ option.name }}
           </div>
         </template>
         <template slot="selected-option" slot-scope="option">
-          <div class="selected d-center" >
+          <div class="selected d-center">
             {{ option.name }}
           </div>
         </template>
         <div class="spinner" v-show="loader">Loading...</div>
       </v-select>
-      <input type="number" placeholder="Quantiter" v-model="quantity">
-      <select v-model="unity">
-        <option value="gr">gr</option>
-        <option value="pce">pce</option>
-      </select>
+      <div class="flex justify-center mb-3">
 
-      <button class="btn btn-classic" @click="addIngredientToNewRecipes">ajouter un autre ingredient</button>
-      <div v-if="newIngredientsRecipe">
-        <div class="ingredientsFields" v-for="(ingredient, index) in newIngredientsRecipe" :key="index">
-          <p> {{ ingredient.name }} {{ingredient.quantity}} {{ingredient.unity}}</p>
-        </div>
+        <label for="quantity" class="pr-4">Quantiter:</label>
+        <input class="" type="number" name="quantity" placeholder="0" v-model="quantity">
+
+        <label for="unity">Unité</label>
+        <select v-model="unity" name="unity">
+          <option value="gr">gr</option>
+          <option value="pce">pce</option>
+        </select>
+
       </div>
-      <textarea name="method" v-model="method"/>
+      <div class="" @click="addIngredientToNewRecipes">Ajouter un autre ingredient</div>
+      <div class="ingredientsFields" v-for="(ingredient, index) in newIngredientsRecipe" :key="index">
+        <p>{{ ingredient.name }} {{ ingredient.quantity }} {{ ingredient.unity }}</p>
+      </div>
+      <label class="text-left" for="method">Method de la recette</label>
+      <textarea name="method" placeholder="Description de la method de la recette" v-model="method"/>
       <button @click="newRecipe">Soumettre le formulaire</button>
     </form>
 
@@ -132,6 +137,12 @@ export default {
         }
       })
     },
+  },
+  addNotification() {
+    this.notify({
+      message: 'Welcome',
+      type: 'success'
+    })
   },
   mounted: function() {
     this.getAllRecipes()

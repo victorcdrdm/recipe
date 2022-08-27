@@ -41,7 +41,7 @@ class Recipe
     private $id;
 
     /**
-     * @ORM\Column(type="text", unique=true)
+     * @ORM\Column(type="string", length=255, unique=true)
      * @Groups({"recipies:read", "recipies:whrite"})
      */
     private $name;
@@ -77,7 +77,6 @@ class Recipe
     public function setName(string $name): self
     {  
         $this->name = $name;
-        //var_dump('youpis');die();
         return $this;
     }
 
